@@ -1,0 +1,8 @@
+{
+    "APP": "order-service",
+    "SERVICE": "order",
+    "EXPORT_TABLE_NAME": "OrderTableName",
+    "EXPORT_TABLE_ARN": "OrderTableArn",
+    "MODEL": "order",
+    "MODEL_PLURAL": "order"
+}

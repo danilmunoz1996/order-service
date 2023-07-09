@@ -1,0 +1,57 @@
+app: ${file(./project-metadata.json):APP}
+service: ${file(./project-metadata.json):SERVICE}
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    TABLE_NAME: !ImportValue ${file(./project-metadata.json):EXPORT_TABLE_NAME}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: 
+            - !ImportValue ${file(./project-metadata.json):EXPORT_TABLE_ARN}
+            - !ImportValue customerIdIndexArn
+            - !ImportValue statusIndexArn
+
+
+functions:
+  create:
+    handler: src/interfaces/rest/${file(./project-metadata.json):MODEL}Routes.create
+    events:
+      - httpApi:
+          path: /${file(./project-metadata.json):MODEL_PLURAL}
+          method: post
+  read:
+    handler: src/interfaces/rest/${file(./project-metadata.json):MODEL}Routes.read
+    events:
+      - httpApi:
+          path: /${file(./project-metadata.json):MODEL_PLURAL}/{id}
+          method: get
+  update:
+    handler: src/interfaces/rest/${file(./project-metadata.json):MODEL}Routes.update
+    events:
+      - httpApi:
+          path: /${file(./project-metadata.json):MODEL_PLURAL}/{id}
+          method: put
+  delete:
+    handler: src/interfaces/rest/${file(./project-metadata.json):MODEL}Routes.delete
+    events:
+      - httpApi:
+          path: /${file(./project-metadata.json):MODEL_PLURAL}/{id}
+          method: delete
+  list:
+    handler: src/interfaces/rest/${file(./project-metadata.json):MODEL}Routes.list
+    events:
+      - httpApi:
+          path: /${file(./project-metadata.json):MODEL_PLURAL}
+          method: get
